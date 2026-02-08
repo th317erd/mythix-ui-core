@@ -2,7 +2,8 @@
 
 import * as Util            from 'node:util';
 import { matchesSnapshot }  from './snapshot.js';
-import { isPlainObject }    from '../../lib/utils.js';
+import { BaseUtils }    from '../../lib/index.js';
+const { isPlainObject } = BaseUtils;
 
 beforeEach(function() {
   jasmine.addMatchers({
@@ -43,8 +44,4 @@ export function inspectLog(...args) {
   console.log(inspect.call(this, ...args));
 }
 
-globalThis.HTMLElement = class HTMLElement {};
-globalThis.customElements = {
-  define: () => {},
-  get:    () => {},
-};
+// Global browser environment is now set up in helpers/global-setup.js

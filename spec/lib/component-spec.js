@@ -5,6 +5,7 @@ import { JSDOM }      from 'jsdom';
 
 describe('MythixUIComponent', () => {
   let dom;
+  let testInstance;
 
   beforeEach(() => {
     dom = new JSDOM(`
@@ -24,22 +25,32 @@ describe('MythixUIComponent', () => {
     globalThis.document = window.document;
     globalThis.Node = window.Node;
     globalThis.HTMLElement = window.HTMLElement;
+
+    // Create a mock instance with the classes method bound
+    testInstance = {
+      classes: MythixUIComponent.prototype.classes,
+    };
   });
 
-  // describe('compileStyleForDocument', () => {
-  //   it('works', () => {
-  //     let styleElement = dom.window.document.head.querySelector('style');
-  //     expect(MythixUIComponent.compileStyleForDocument('test-component', styleElement).replace(/\n+/, ' ')).toEqual('test-component[stuff="true"], test-component .sub, test-component.test {color: red;} body.dark test-component span {background-color: black;}');
-  //   });
-  // });
+  describe('classes method', () => {
+    it('combines class names from strings', () => {
+      expect(testInstance.classes('test', 'derp', 'wow')).toBe('test derp wow');
+    });
 
-  describe('classes', () => {
-    it('works', () => {
-      let test = new MythixUIComponent();
+    it('handles conditional objects', () => {
+      expect(testInstance.classes('test', { stuff: true, otherStuff: false })).toBe('test stuff');
+    });
 
-      expect(test.classes('test', 'derp', 'wow')).toBe('test derp wow');
-      expect(test.classes('test', { stuff: true, otherStuff: false })).toBe('test stuff');
-      expect(test.classes('test', { stuff: true, otherStuff: false }, [ '   cool', '  bean ' ])).toBe('test stuff cool bean');
+    it('handles arrays and mixed input', () => {
+      expect(testInstance.classes('test', { stuff: true, otherStuff: false }, [ '   cool', '  bean ' ])).toBe('test stuff cool bean');
+    });
+
+    it('handles empty input', () => {
+      expect(testInstance.classes()).toBe('');
+    });
+
+    it('filters falsy values from objects', () => {
+      expect(testInstance.classes('a', { b: true, c: false, d: true })).toBe('a b d');
     });
   });
 });

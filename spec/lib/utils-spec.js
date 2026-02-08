@@ -6,6 +6,7 @@ import * as _TestHelpers from '../support/test-helpers.js';
 
 import {
   BaseUtils,
+  Utils,
 } from '../../lib/index.js';
 
 describe('Utils', () => {
@@ -255,16 +256,156 @@ describe('Utils', () => {
         'wow',
       ];
 
-      expect(BaseUtils.fetchPath(undefined, null, null)).toBe(null);
-      expect(BaseUtils.fetchPath(undefined, null, 'derp')).toBe('derp');
-      expect(BaseUtils.fetchPath(data, 'test.stuff')).toBe(undefined);
-      expect(BaseUtils.fetchPath(data, 'stuff2', null)).toBe(null);
-      expect(BaseUtils.fetchPath(data, 'test', 'derp')).toBe(true);
-      expect(BaseUtils.fetchPath(data, 'stuff', null)).toBe(data.stuff);
-      expect(BaseUtils.fetchPath(data, 'stuff.life')).toBe(42);
-      expect(BaseUtils.fetchPath(arr, '0.test')).toBe('hello');
-      expect(BaseUtils.fetchPath(arr, '1')).toBe(1);
-      expect(BaseUtils.fetchPath(arr, '2.length')).toBe(3);
+      expect(Utils.fetchPath(undefined, null, null)).toBe(null);
+      expect(Utils.fetchPath(undefined, null, 'derp')).toBe('derp');
+      expect(Utils.fetchPath(data, 'test.stuff')).toBe(undefined);
+      expect(Utils.fetchPath(data, 'stuff2', null)).toBe(null);
+      expect(Utils.fetchPath(data, 'test', 'derp')).toBe(true);
+      expect(Utils.fetchPath(data, 'stuff', null)).toBe(data.stuff);
+      expect(Utils.fetchPath(data, 'stuff.life')).toBe(42);
+      expect(Utils.fetchPath(arr, '0.test')).toBe('hello');
+      expect(Utils.fetchPath(arr, '1')).toBe(1);
+      expect(Utils.fetchPath(arr, '2.length')).toBe(3);
+    });
+  });
+
+  describe('generateID', () => {
+    it('generates unique IDs', () => {
+      let id1 = BaseUtils.generateID();
+      let id2 = BaseUtils.generateID();
+      let id3 = BaseUtils.generateID();
+
+      expect(id1).not.toBe(id2);
+      expect(id2).not.toBe(id3);
+      expect(id1).not.toBe(id3);
+    });
+
+    it('generates IDs with correct format', () => {
+      let id = BaseUtils.generateID();
+      expect(id.startsWith('ID')).toBe(true);
+      expect(id.length).toBeGreaterThan(20);
+    });
+  });
+
+  describe('getObjectID', () => {
+    it('returns same ID for same object', () => {
+      let obj = { test: true };
+      let id1 = BaseUtils.getObjectID(obj);
+      let id2 = BaseUtils.getObjectID(obj);
+
+      expect(id1).toBe(id2);
+    });
+
+    it('returns different IDs for different objects', () => {
+      let obj1 = { test: 1 };
+      let obj2 = { test: 2 };
+
+      expect(BaseUtils.getObjectID(obj1)).not.toBe(BaseUtils.getObjectID(obj2));
+    });
+  });
+
+  describe('coerce', () => {
+    it('coerces null string', () => {
+      expect(BaseUtils.coerce('null')).toBe(null);
+    });
+
+    it('coerces undefined string', () => {
+      expect(BaseUtils.coerce('undefined')).toBe(undefined);
+    });
+
+    it('coerces boolean strings', () => {
+      expect(BaseUtils.coerce('true')).toBe(true);
+      expect(BaseUtils.coerce('false')).toBe(false);
+    });
+
+    it('coerces number strings', () => {
+      expect(BaseUtils.coerce('42')).toBe(42);
+      expect(BaseUtils.coerce('3.14')).toBe(3.14);
+      expect(BaseUtils.coerce('-10')).toBe(-10);
+    });
+
+    it('coerces special number strings', () => {
+      expect(BaseUtils.coerce('NaN')).toBeNaN();
+      expect(BaseUtils.coerce('Infinity')).toBe(Infinity);
+      expect(BaseUtils.coerce('-Infinity')).toBe(-Infinity);
+    });
+
+    it('returns non-coercible strings as-is', () => {
+      expect(BaseUtils.coerce('hello')).toBe('hello');
+      expect(BaseUtils.coerce('not a number')).toBe('not a number');
+    });
+  });
+
+  describe('isCollectable', () => {
+    it('returns true for objects', () => {
+      expect(BaseUtils.isCollectable({})).toBe(true);
+      expect(BaseUtils.isCollectable([])).toBe(true);
+      expect(BaseUtils.isCollectable(() => {})).toBe(true);
+    });
+
+    it('returns false for primitives', () => {
+      expect(BaseUtils.isCollectable(null)).toBe(false);
+      expect(BaseUtils.isCollectable(undefined)).toBe(false);
+      expect(BaseUtils.isCollectable(42)).toBe(false);
+      expect(BaseUtils.isCollectable('string')).toBe(false);
+      expect(BaseUtils.isCollectable(true)).toBe(false);
+    });
+  });
+
+  describe('SHA256', () => {
+    it('generates consistent hash', () => {
+      let hash1 = BaseUtils.SHA256('hello world');
+      let hash2 = BaseUtils.SHA256('hello world');
+
+      expect(hash1).toBe(hash2);
+    });
+
+    it('generates different hashes for different input', () => {
+      let hash1 = BaseUtils.SHA256('hello');
+      let hash2 = BaseUtils.SHA256('world');
+
+      expect(hash1).not.toBe(hash2);
+    });
+
+    it('generates 64 character hex string', () => {
+      let hash = BaseUtils.SHA256('test');
+      expect(hash.length).toBe(64);
+      expect(/^[a-f0-9]+$/.test(hash)).toBe(true);
+    });
+  });
+
+  describe('createResolvable', () => {
+    it('creates a promise that can be resolved externally', async () => {
+      let resolvable = BaseUtils.createResolvable();
+
+      setTimeout(() => resolvable.resolve('done'), 10);
+
+      let result = await resolvable;
+      expect(result).toBe('done');
+    });
+
+    it('creates a promise that can be rejected externally', async () => {
+      let resolvable = BaseUtils.createResolvable();
+
+      setTimeout(() => resolvable.reject(new Error('failed')), 10);
+
+      try {
+        await resolvable;
+        fail('Should have rejected');
+      } catch (e) {
+        expect(e.message).toBe('failed');
+      }
+    });
+
+    it('tracks status correctly', async () => {
+      let resolvable = BaseUtils.createResolvable();
+
+      expect(resolvable.status()).toBe('pending');
+
+      resolvable.resolve('done');
+      await resolvable;
+
+      expect(resolvable.status()).toBe('fulfilled');
     });
   });
 });

@@ -4,6 +4,7 @@
     "**/*[sS]pec.?(m)js"
   ],
   "helpers": [
+    "helpers/global-setup.js",
     "helpers/**/*.?(m)js"
   ],
   "env": {
