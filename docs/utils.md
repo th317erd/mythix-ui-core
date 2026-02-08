@@ -128,24 +128,51 @@ Utils.isTemplate('Hello world');     // false
 
 ## Event Handling
 
-### `bindEventToElement(element, eventName, callback)`
+Mythix UI uses the `data-event-on{eventName}` attribute pattern for event binding.
 
-Bind an event listener to an element with template macro support.
+### `bindDataEventAttribute(element, eventName)`
 
-```javascript
-Utils.bindEventToElement.call(component, button, 'click', 'handleClick');
-// or
-Utils.bindEventToElement.call(component, button, 'click', (e) => { ... });
-```
-
-### `getAllEventNamesForElement(element)`
-
-Get all event handler attribute names for an element.
+Bind a `data-event-on{eventName}` attribute to an element. The element must have the corresponding attribute set.
 
 ```javascript
-const events = Utils.getAllEventNamesForElement(button);
-// Returns: ['onclick', 'onmousedown', 'onmouseup', ...]
+// HTML: <button data-event-onclick="handleClick">Click</button>
+Utils.bindDataEventAttribute(button, 'click');
 ```
+
+### `bindAllDataEventAttributes(element)`
+
+Detect and bind all `data-event-on*` attributes on an element.
+
+```javascript
+// HTML: <input data-event-oninput="handleInput" data-event-onfocus="handleFocus">
+Utils.bindAllDataEventAttributes(inputElement);
+```
+
+### `createScanningProxy(startElement)`
+
+Create a proxy that scans the DOM for property lookups. Starts from the element and scans up via `parentElement`, crossing Shadow DOM boundaries, stopping at MythixComponent boundaries.
+
+```javascript
+const proxy = Utils.createScanningProxy(element);
+// Accessing proxy.myMethod will scan up the DOM to find 'myMethod'
+```
+
+### `mythixEventWrapper(event)`
+
+Generic event wrapper function for `data-event-on{eventName}` attributes. Called with `this` bound to the element with the attribute.
+
+```javascript
+// Typically bound automatically, but can be used manually:
+element.addEventListener('click', Utils.mythixEventWrapper.bind(element));
+```
+
+### `bindEventToElement(element, eventName, callback)` *(Deprecated)*
+
+> **Deprecated:** Use `data-event-on{eventName}` attributes with `bindDataEventAttribute` instead.
+
+### `getAllEventNamesForElement(element)` *(Deprecated)*
+
+> **Deprecated:** Use `data-event-on{eventName}` attributes instead of detecting standard `on*` attributes.
 
 ## Property Path Access
 
