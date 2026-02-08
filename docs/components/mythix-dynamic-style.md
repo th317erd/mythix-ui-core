@@ -121,9 +121,9 @@ class ThemeController extends MythixUIComponent {
       color: white;
     }
   </style>
-  <button onclick="setTheme('light')" class="@@theme === 'light' ? 'active' : ''@@">Light</button>
-  <button onclick="setTheme('dark')" class="@@theme === 'dark' ? 'active' : ''@@">Dark</button>
-  <button onclick="setTheme('system')" class="@@theme === 'system' ? 'active' : ''@@">System</button>
+  <button data-event-onclick="setTheme('light')" class="@@theme === 'light' ? 'active' : ''@@">Light</button>
+  <button data-event-onclick="setTheme('dark')" class="@@theme === 'dark' ? 'active' : ''@@">Dark</button>
+  <button data-event-onclick="setTheme('system')" class="@@theme === 'system' ? 'active' : ''@@">System</button>
 </template>
 ```
 

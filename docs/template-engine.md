@@ -116,14 +116,16 @@ Combine static and dynamic content:
 
 ## Event Bindings
 
+Mythix UI uses the `data-event-on{eventName}` attribute pattern for event binding. This pattern is explicit about which attributes are processed by the framework (rather than modifying standard HTML event attributes).
+
 ### Method Reference
 
-Reference a component method by name:
+Reference a component method by name. The framework automatically scans up the DOM to find the method:
 
 ```html
-<button onclick="handleClick">Click Me</button>
-<input oninput="handleInput">
-<form onsubmit="handleSubmit">
+<button data-event-onclick="handleClick">Click Me</button>
+<input data-event-oninput="handleInput">
+<form data-event-onsubmit="handleSubmit">
 ```
 
 ### Inline Expressions
@@ -131,25 +133,41 @@ Reference a component method by name:
 Use `this` to reference the component:
 
 ```html
-<button onclick="this.handleClick(event)">Click</button>
-<button onclick="this.count = this.count.valueOf() + 1">Increment</button>
+<button data-event-onclick="this.handleClick(event)">Click</button>
+<button data-event-onclick="this.count = this.count.valueOf() + 1">Increment</button>
 ```
 
 ### Passing Arguments
 
 ```html
-<button onclick="handleItemClick(item.id)">Select</button>
-<li onclick="selectItem(index)">@@item.name@@</li>
+<button data-event-onclick="handleItemClick(item.id)">Select</button>
+<li data-event-onclick="selectItem(index)">@@item.name@@</li>
 ```
 
 ### Event Object Access
 
-The `event` variable is automatically available:
+The `event` variable is automatically available. For simple method references without parentheses, the method is auto-invoked with the event as the first argument:
 
 ```html
-<input oninput="this.search = event.target.value">
-<button onclick="console.log(event.target)">Log Target</button>
+<!-- Auto-invoked with event -->
+<button data-event-onclick="this.handleClick">Click</button>
+
+<!-- Explicit event access -->
+<input data-event-oninput="this.search = event.target.value">
+<button data-event-onclick="console.log(event.target)">Log Target</button>
 ```
+
+### How Method Lookup Works
+
+When an event is triggered, the framework creates a "scanning proxy" that:
+
+1. Starts from the element with the `data-event-on*` attribute
+2. Scans up the DOM via `parentElement`
+3. Crosses Shadow DOM boundaries via `getRootNode().host`
+4. Stops at the first MythixComponent/WebComponent boundary
+5. Returns the first matching property found
+
+This allows methods defined on parent components to be referenced from child elements naturally.
 
 ## Scope Resolution
 
@@ -227,7 +245,7 @@ class Counter extends MythixUIComponent {
 ```html
 <template data-for="counter-component">
   <p>Count: @@count@@</p>
-  <button onclick="increment">+1</button>
+  <button data-event-onclick="increment">+1</button>
 </template>
 ```
 
@@ -372,13 +390,13 @@ class MyComponent extends MythixUIComponent {
     .valid { color: green; }
   </style>
 
-  <form onsubmit="handleSubmit">
+  <form data-event-onsubmit="handleSubmit">
     <div class="field">
       <label>Username</label>
       <input
         type="text"
         value="@@username@@"
-        oninput="username = event.target.value"
+        data-event-oninput="username = event.target.value"
         class="@@usernameError ? 'error' : ''@@"
       >
       <span class="error">@@usernameError@@</span>
@@ -389,7 +407,7 @@ class MyComponent extends MythixUIComponent {
       <input
         type="email"
         value="@@email@@"
-        oninput="email = event.target.value"
+        data-event-oninput="email = event.target.value"
         class="@@emailError ? 'error' : ''@@"
       >
       <span class="error">@@emailError@@</span>

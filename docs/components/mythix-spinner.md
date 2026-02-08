@@ -157,7 +157,7 @@ LoadingButton.register();
 Usage:
 
 ```html
-<loading-button onclick="handleSubmit">Submit</loading-button>
+<loading-button data-event-onclick="handleSubmit">Submit</loading-button>
 
 <script>
 async function handleSubmit(event) {

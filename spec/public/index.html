@@ -94,7 +94,7 @@
         </p>
       </mythix-for-each>
 
-      <button onclick="$('#modal').showModal()">Open Modal @@$$.dynamicPropID('searchField')@@</button>
+      <button data-event-onclick="$('#modal').showModal()">Open Modal @@$$.dynamicPropID('searchField')@@</button>
       <mythix-prompt-modal class="phantom" id="modal" autoclose>
         <!-- <button slot="footer">Hello world!</button>
         <button slot="footer">@@$$.i18n('Mythix.MythixModal.Prompt.confirmButton.caption', 'Yes')@@</button>

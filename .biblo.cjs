@@ -175,7 +175,7 @@ function _convert({ scope, source, Parser }, _content) {
 
       return emojis[name] || m;
     }).replace(/@nextEntity;/g, () => {
-      return `<button class="next-page-button" onclick="globalThis.globalScope.goToNextEntity(event)"><span>Go to Next Page</span><span class="material-symbols-outlined">skip_next</span></button>`;
+      return `<button class="next-page-button" data-event-onclick="globalThis.globalScope.goToNextEntity(event)"><span>Go to Next Page</span><span class="material-symbols-outlined">skip_next</span></button>`;
     });
   };
 

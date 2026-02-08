@@ -69,7 +69,7 @@ MyCounter.register();
     button { padding: 0.5em 1em; }
   </style>
   <p>Count: @@count@@</p>
-  <button onclick="increment">Increment</button>
+  <button data-event-onclick="increment">Increment</button>
 </template>
 
 <my-counter></my-counter>

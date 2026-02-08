@@ -128,9 +128,11 @@ The template engine uses `@@expression@@` syntax for dynamic content:
 
 ### Accessing Component Methods
 
+Use `data-event-on{eventName}` for event binding:
+
 ```html
-<button onclick="handleClick">Click Me</button>
-<button onclick="this.handleClick(event)">Click Me</button>
+<button data-event-onclick="handleClick">Click Me</button>
+<button data-event-onclick="this.handleClick(event)">Click Me</button>
 ```
 
 ### i18n Lookups
@@ -175,9 +177,9 @@ CounterComponent.register();
     button { padding: 0.5rem 1rem; }
     .count { font-size: 1.5rem; min-width: 3rem; text-align: center; }
   </style>
-  <button onclick="decrement">-</button>
+  <button data-event-onclick="decrement">-</button>
   <span class="count">@@count@@</span>
-  <button onclick="increment">+</button>
+  <button data-event-onclick="increment">+</button>
 </template>
 
 <counter-component></counter-component>

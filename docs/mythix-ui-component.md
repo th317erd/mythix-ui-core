@@ -506,10 +506,10 @@ TodoList.register();
   <mythix-for-each items="@@items@@">
     <div class="@@item.done ? 'done' : ''@@">
       <input type="checkbox"
-             onchange="toggleItem(item.id)"
+             data-event-onchange="toggleItem(item.id)"
              checked="@@item.done@@">
       @@item.text@@
-      <button onclick="removeItem(item.id)">Remove</button>
+      <button data-event-onclick="removeItem(item.id)">Remove</button>
     </div>
   </mythix-for-each>
 </template>

@@ -236,7 +236,7 @@ LanguageSwitcher.register();
   </style>
   <mythix-for-each items="@@languages@@">
     <button
-      onclick="switchLanguage(item.code)"
+      data-event-onclick="switchLanguage(item.code)"
       class="@@getCurrentLang() === item.code ? 'active' : ''@@"
     >
       @@item.label@@
